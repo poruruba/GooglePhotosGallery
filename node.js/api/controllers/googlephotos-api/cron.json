@@ -1,0 +1,12 @@
+[
+  {
+    "enable": true,
+    "schedule": "0 0 0 1 * *",
+    "handler": "trigger"
+  },
+  {
+    "enable": true,
+    "schedule": "0 0 1 * * *",
+    "handler": "trigger2"
+  }
+]
