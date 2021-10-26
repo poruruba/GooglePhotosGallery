@@ -14,8 +14,8 @@ const ALBUM_LIST_FILE_PATH = process.env.THIS_BASE_PATH + '/data/googlephotos/al
 const UPDATE_INTERVAL = 60 * 60 * 24 * 1000;
 const ALBUM_NAME = 'for Photo frame';
 
-const API_KEY = "y“K“–‚ÈAPIƒL[z";
-const api_url = 'https://yNode.jsƒT[ƒo‚ÌƒzƒXƒg–¼z';
+const API_KEY = "ã€é©å½“ãªAPIã‚­ãƒ¼ã€‘";
+const api_url = 'https://ã€Node.jsã‚µãƒ¼ãƒã®ãƒ›ã‚¹ãƒˆåã€‘';
 
 const filetype = require('file-type');
 
@@ -33,10 +33,19 @@ exports.handler = async (event, context, callback) => {
     }
     case '/googlephotos-get-sharedalbum': {
       var json = await read_token();
-      var result = await do_get_with_token('https://photoslibrary.googleapis.com/v1/sharedAlbums', {}, json.access_token);
-      console.log(result);
 
-      return new Response({ list: result.sharedAlbums });
+      var album_list = await do_get_with_token('https://photoslibrary.googleapis.com/v1/sharedAlbums', {}, json.access_token);
+      var albums = album_list.sharedAlbums || [];
+      while(album_list.nextPageToken ){
+        var params = {
+          pageToken: album_list.nextPageToken
+        };
+        album_list = await do_get_with_token('https://photoslibrary.googleapis.com/v1/sharedAlbums', params, json.access_token);
+        if (album_list.sharedAlbums )
+          albums = albums.concat(album_list.sharedAlbums);
+      }
+
+      return new Response({ list: albums });
     }
     case '/googlephotos-get-albumlist': {
       var body = JSON.parse(event.body);
@@ -110,11 +119,17 @@ exports.handler = async (event, context, callback) => {
       json.created_at = new Date().getTime();
 
       var album_list = await do_get_with_token('https://photoslibrary.googleapis.com/v1/albums', {}, json.access_token);
-      console.log(album_list);
+      var albums = album_list.albums || [];
+      while( album_list.nextPageToken ){
+        var params = {
+          pageToken: album_list.nextPageToken
+        };
+        album_list = await do_get_with_token('https://photoslibrary.googleapis.com/v1/albums', params, json.access_token);
+        if( album_list.albums )
+          albums = albums.concat(album_list.albums);
+      }
 
-      var album;
-      if( album_list.albums )
-        album = album_list.albums.find(item => item.title == ALBUM_NAME );
+      var album = album_list.albums.find(item => item.title == ALBUM_NAME );
       if( !album ){
         var params2 = {
           album: {
