@@ -4,12 +4,11 @@ const HELPER_BASE = process.env.HELPER_BASE || '../../helpers/';
 const Response = require(HELPER_BASE + 'response');
 const BinResponse = require(HELPER_BASE + 'binresponse');
 
-const FONT_PATH = process.env.THIS_BASE_PATH + '/font/ipaexg.ttf';
 const IMAGE_LIST_FILE_PATH = process.env.THIS_BASE_PATH + '/data/instagram/image_list.json';
 const TOKEN_FILE_PATH = process.env.THIS_BASE_PATH + '/data/instagram/access_token.json';
 const UPDATE_INTERVAL = 60 * 60 * 24 * 1000;
 
-const INITIAL_ACCESS_TOKEN = 'Åyí∑ä˙ä‘ÉAÉNÉZÉXÉgÅ[ÉNÉìÅz';
+const INITIAL_ACCESS_TOKEN = '„ÄêÈï∑ÊúüÈñì„Ç¢„ÇØ„Çª„Çπ„Éà„Éº„ÇØ„É≥„Äë';
 
 const image_list_url = 'https://graph.instagram.com/me/media';
 const refresh_url = 'https://graph.instagram.com/refresh_access_token';
