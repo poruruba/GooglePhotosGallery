@@ -69,14 +69,22 @@ var vue_options = {
             this.album_list = list;
         },
         call_albumlist_change: async function(){
-            var result = await do_post(googlephotos_base_url + '/googlephotos-get-sharedalbum');
-            this.sharedalbum_list = result.list;
-            this.sharedalbum_check = [];
-            for (var i = 0; i < this.sharedalbum_list.length ; i++ ){
-                if (this.album_list.findIndex(item => item.id == this.sharedalbum_list[i].id ) >= 0 )
-                    this.sharedalbum_check[i] = true;
-                else
-                    this.sharedalbum_check[i] = false;
+            try{
+              this.progress_open();
+              var result = await do_post(googlephotos_base_url + '/googlephotos-get-sharedalbum');
+              this.sharedalbum_list = result.list;
+              this.sharedalbum_check = [];
+              for (var i = 0; i < this.sharedalbum_list.length ; i++ ){
+                  if (this.album_list.findIndex(item => item.id == this.sharedalbum_list[i].id ) >= 0 )
+                      this.sharedalbum_check[i] = true;
+                  else
+                      this.sharedalbum_check[i] = false;
+              }
+            }catch(error){
+              console.error(error);
+              return;
+            }finally{
+              this.progress_close();
             }
             this.dialog_open('#albumlist_change_dialog');
         },
