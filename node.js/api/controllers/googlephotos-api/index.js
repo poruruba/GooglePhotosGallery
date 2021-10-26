@@ -129,7 +129,7 @@ exports.handler = async (event, context, callback) => {
           albums = albums.concat(album_list.albums);
       }
 
-      var album = album_list.albums.find(item => item.title == ALBUM_NAME );
+      var album = albums.find(item => item.title == ALBUM_NAME );
       if( !album ){
         var params2 = {
           album: {
