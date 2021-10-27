@@ -115,6 +115,7 @@ exports.handler = async (event, context, callback) => {
       json.id_token = result_token.id_token;
       json.refresh_token = result_token.refresh_token;
       json.scope = result_token.scope;
+      json.token_type = result_token.token_type;
       json.expires_in = result_token.expires_in;
       json.created_at = new Date().getTime();
 
