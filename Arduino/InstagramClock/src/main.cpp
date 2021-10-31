@@ -150,7 +150,7 @@ void loop() {
     Serial.println(meigen);
 #endif
 
-#define CALENDAR_ENABLE
+#ifdef CALENDAR_ENABLE
     ret = doHttpPost(calendar_url, &json_response);
     if (ret != 0){
       Serial.println("doHttpGetJson Error");
