@@ -4,17 +4,16 @@ const HELPER_BASE = process.env.HELPER_BASE || '../../helpers/';
 const Response = require(HELPER_BASE + 'response');
 const jsonfile = require(HELPER_BASE + 'jsonfile-utils');
 
-const CLIENT_ID = 'yƒNƒ‰ƒCƒAƒ“ƒgIDz';
-const CLIENT_SECRET = 'yƒNƒ‰ƒCƒAƒ“ƒgƒV[ƒNƒŒƒbƒgz';
+const CLIENT_ID = 'ã€ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆIDã€‘';
 
 const TOKEN_FILE_PATH = process.env.THIS_BASE_PATH + '/data/googlephotos/access_token.json';
 const EVENT_LIST_FILE_PATH = process.env.THIS_BASE_PATH + '/data/googlecalendar/event_list.json';
-const CALENDAR_WEBHOOK_URL = 'https://yNode.jsƒT[ƒo‚ÌƒzƒXƒg–¼z/googlecalendar-webhooks';
+const CALENDAR_WEBHOOK_URL = 'https://ã€Node.jsã‚µãƒ¼ãƒã®ãƒ›ã‚¹ãƒˆåã€‘/googlecalendar-webhooks';
 
-const API_KEY = "y“K“–‚ÈAPIƒL[z";
-const api_url = 'https://yNode.jsƒT[ƒo‚ÌƒzƒXƒg–¼z';
+const API_KEY = "ã€é©å½“ãªAPIã‚­ãƒ¼ã€‘";
+const api_url = 'https://ã€Node.jsã‚µãƒ¼ãƒã®ãƒ›ã‚¹ãƒˆåã€‘';
 
-const mqtt_url = "mqtt://yMQTTƒuƒ[ƒJ‚ÌƒzƒXƒg–¼z:1883";
+const mqtt_url = "mqtt://ã€MQTTãƒ–ãƒ­ãƒ¼ã‚«ã®ãƒ›ã‚¹ãƒˆåã€‘:1883";
 const TOPIC_CMD = 'calendar/notify';
 
 const mqtt = require('mqtt')
@@ -121,13 +120,13 @@ exports.trigger = async (event, context, callback) => {
 };
 
 function get_calendar(token){
-  const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET);
+  const oAuth2Client = new google.auth.OAuth2(CLIENT_ID);
   oAuth2Client.setCredentials(token);
   return google.calendar({ version: 'v3', auth: oAuth2Client });
 }
 
 function get_tasks(token) {
-  const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET);
+  const oAuth2Client = new google.auth.OAuth2(CLIENT_ID);
   oAuth2Client.setCredentials(token);
   return google.tasks({ version: 'v1', auth: oAuth2Client });
 }
