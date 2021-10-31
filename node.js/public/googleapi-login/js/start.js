@@ -15,15 +15,17 @@ var vue_options = {
     computed: {
     },
     methods: {
-        do_login: function () {
+        do_login: function (access_type) {
             var params = {
                 scope: decodeURI(searchs.scope),
                 response_type: 'code',
                 client_id: CLIENT_ID,
                 redirect_uri: REDIRECT_URI,
-                access_type: 'offline',
-                prompt: 'consent'
             };
+            if( access_type ){
+                params.access_type = 'offline';
+                params.prompt = 'consent';
+            }
             if( searchs.state )
                 params.state = searchs.state;
             window.location = 'https://accounts.google.com/o/oauth2/v2/auth' + '?' + new URLSearchParams(params).toString();
@@ -44,7 +46,7 @@ var vue_options = {
             window.opener.vue.do_token(qs);
             window.close();
         }else if( searchs.scope ){
-            this.do_login();
+            this.do_login(searchs.access_type);
         }else{
             this.message = 'scope が指定されていません。'
         }

@@ -3,20 +3,19 @@
 const HELPER_BASE = process.env.HELPER_BASE || '../../helpers/';
 const Response = require(HELPER_BASE + 'response');
 const BinResponse = require(HELPER_BASE + 'binresponse');
-
 const jsonfile = require(HELPER_BASE + 'jsonfile-utils');
-const sharp = require('sharp');
-const jwt_decode = require('jwt-decode');
 
 const TOKEN_FILE_PATH = process.env.THIS_BASE_PATH + '/data/googlephotos/access_token.json';
 const IMAGE_LIST_FILE_PATH = process.env.THIS_BASE_PATH + '/data/googlephotos/image_list.json';
 const ALBUM_LIST_FILE_PATH = process.env.THIS_BASE_PATH + '/data/googlephotos/album_list.json';
-const UPDATE_INTERVAL = 60 * 60 * 24 * 1000;
+const UPDATE_IMAGE_LIST_INTERVAL = 60 * 60 * 24 * 1000;
 const ALBUM_NAME = 'for Photo frame';
 
 const API_KEY = "【適当なAPIキー】";
 const api_url = 'https://【Node.jsサーバのホスト名】';
 
+const sharp = require('sharp');
+const jwt_decode = require('jwt-decode');
 const filetype = require('file-type');
 
 const { URL, URLSearchParams } = require('url');
@@ -50,20 +49,21 @@ exports.handler = async (event, context, callback) => {
     case '/googlephotos-get-albumlist': {
       var body = JSON.parse(event.body);
 
-      var list = await jsonfile.read_json(ALBUM_LIST_FILE_PATH, []);
-      return new Response({ list: list });
+      var album_list = await read_album_list();
+      return new Response({ list: album_list.list });
     }
     case '/googlephotos-update-albumlist': {
       var body = JSON.parse(event.body);
       console.log(body);
 
       var json = await read_token();
+      var album_list = await read_album_list();
+      album_list.list = body.list;
 
-      await jsonfile.write_json(ALBUM_LIST_FILE_PATH, body.list);
+      await jsonfile.write_json(ALBUM_LIST_FILE_PATH, album_list);
 
       var list = await jsonfile.read_json(IMAGE_LIST_FILE_PATH, { data: [] });
-      var sharedalbum_list = await jsonfile.read_json(ALBUM_LIST_FILE_PATH, []);
-      list.data = await get_all_image_list(json.albumId, sharedalbum_list, json.access_token);
+      list.data = await get_all_image_list(album_list, json.access_token);
       list.update_at = new Date().getTime();
       await jsonfile.write_json(IMAGE_LIST_FILE_PATH, list);
 
@@ -113,11 +113,16 @@ exports.handler = async (event, context, callback) => {
       var json = await jsonfile.read_json(TOKEN_FILE_PATH, {});
       json.access_token = result_token.access_token;
       json.id_token = result_token.id_token;
+      if (result_token.refresh_token )
       json.refresh_token = result_token.refresh_token;
       json.scope = result_token.scope;
       json.token_type = result_token.token_type;
       json.expires_in = result_token.expires_in;
       json.created_at = new Date().getTime();
+
+      await jsonfile.write_json(TOKEN_FILE_PATH, json);
+
+      var album_list_json = await jsonfile.read_json(ALBUM_LIST_FILE_PATH, { list: [] });
 
       var album_list = await do_get_with_token('https://photoslibrary.googleapis.com/v1/albums', {}, json.access_token);
       var albums = album_list.albums || [];
@@ -139,9 +144,9 @@ exports.handler = async (event, context, callback) => {
         };
         album = await do_post_with_token('https://photoslibrary.googleapis.com/v1/albums', params2, json.access_token);
       }
-      json.albumId = album.id;
+      album_list_json.id = album.id;
 
-      await jsonfile.write_json(TOKEN_FILE_PATH, json);
+      await jsonfile.write_json(ALBUM_LIST_FILE_PATH, album_list_json);
 
       return new Response({ title: ALBUM_NAME });
     }
@@ -164,9 +169,19 @@ exports.trigger = async (event, context, callback) => {
   console.log(json);
 };
 
+exports.trigger2 = async (event, context, callback) => {
+  console.log('googlephotos.trigger2 cron triggered');
+
+  var json = await read_token();
+  var num = await sync_instagram(json);
+  if (num > 0)
+    await update_image_list(json);
+};
+
+
 async function sync_instagram(json){
-  var sharedalbum_list = await jsonfile.read_json(ALBUM_LIST_FILE_PATH, []);
-  var media_list = await get_all_image_list(json.albumId, sharedalbum_list, json.access_token);
+  var album_list = await read_album_list();
+  var media_list = await get_all_image_list(album_list, json.access_token);
 
   var instagram_list = await do_get(api_url + '/instagram-imagelist');
   var params = {
@@ -202,21 +217,10 @@ async function sync_instagram(json){
   return params.newMediaItems.length;
 }
 
-exports.trigger2 = async (event, context, callback) => {
-  console.log('googlephotos.trigger2 cron triggered');
-
-  var json = await read_token();
-
-  var num = await sync_instagram(json);
-
-  if( num > 0 )
-    await update_image_list(json);
-};
-
 async function update_image_list(json){
   var list = await jsonfile.read_json(IMAGE_LIST_FILE_PATH, { data: [] });
-  var sharedalbum_list = await jsonfile.read_json(ALBUM_LIST_FILE_PATH, []);
-  list.data = await get_all_image_list(json.albumId, sharedalbum_list, json.access_token);
+  var album_list = await read_album_list();
+  list.data = await get_all_image_list(album_list, json.access_token);
   list.update_at = new Date().getTime();
   await jsonfile.write_json(IMAGE_LIST_FILE_PATH, list);
 
@@ -226,16 +230,26 @@ async function update_image_list(json){
 async function read_image_list(json){
   var list = await jsonfile.read_json(IMAGE_LIST_FILE_PATH, { data: [] });
   var date = new Date();
-  if (!list.update_at || list.update_at < date.getTime() - UPDATE_INTERVAL) {
+  if (!list.update_at || list.update_at < date.getTime() - UPDATE_IMAGE_LIST_INTERVAL) {
     list = await update_image_list(json);
   }
 
   return list;
 }
 
+async function read_album_list(){
+  var album_list = await jsonfile.read_json(ALBUM_LIST_FILE_PATH);
+  if (!album_list) {
+    console.log('file is not ready.');
+    throw 'file is not ready.';
+  }
+
+  return album_list;
+}
+
 async function read_token() {
   var json = await jsonfile.read_json(TOKEN_FILE_PATH);
-  if (!json || !json.albumId) {
+  if (!json) {
     console.log('file is not ready.');
     throw 'file is not ready.';
   }
@@ -263,10 +277,10 @@ function make_random(max) {
   return Math.floor(Math.random() * (max + 1));
 }
 
-async function get_all_image_list(albumId, sharedalbum_list, access_token) {
-  console.log(albumId, sharedalbum_list, access_token);
+async function get_all_image_list(album_list, access_token) {
+  console.log(album_list, access_token);
   var params = {
-    albumId: albumId,
+    albumId: album_list.id,
     pageSize: 100
   }
   var result2 = await do_post_with_token('https://photoslibrary.googleapis.com/v1/mediaItems:search', params, access_token);
@@ -279,9 +293,9 @@ async function get_all_image_list(albumId, sharedalbum_list, access_token) {
     media_list = media_list.concat(result2.mediaItems);
   }
 
-  for (var i = 0; i < sharedalbum_list.length ; i++ ){
+  for (var i = 0; i < album_list.list.length ; i++ ){
     var params2 = {
-      albumId: sharedalbum_list[i],
+      albumId: album_list.list[i],
       pageSize: 100
     }
     var result3 = await do_post_with_token('https://photoslibrary.googleapis.com/v1/mediaItems:search', params2, access_token);

@@ -1,0 +1,65 @@
+paths:
+  /googlecalendar-list:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: "#/definitions/CommonRequest"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/CommonResponse"
+           
+  /googlecalendar-webhooks:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: "#/definitions/CommonRequest"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/CommonResponse"
+
+  /googlecalendar-register-webhooks:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: "#/definitions/CommonRequest"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/CommonResponse"
+
+  /googlecalendar-unregister-webhooks:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: "#/definitions/CommonRequest"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/CommonResponse"
+
+  /googletasks-list:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: "#/definitions/CommonRequest"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/CommonResponse"

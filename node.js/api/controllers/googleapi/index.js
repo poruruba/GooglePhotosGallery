@@ -11,6 +11,11 @@ const CLIENT_SECRET = '【クライアントシークレット】';
 const API_KEY = "【適当なAPIキー】";
 
 exports.handler = async (event, context, callback) => {
+	if( event.path == '/googleapi-webhooks' ){
+		console.log('/googleapi-webhooks called');
+		console.log(event);
+		return new Response({});
+	}else
   if (event.path == '/googleapi-token') {
     if (event.requestContext.apikeyAuth.apikey != API_KEY)
       throw 'apikey mismatch';

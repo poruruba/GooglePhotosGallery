@@ -8,23 +8,16 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="viewport"
-    content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
 
   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-  <script src="https://code.jquery.com/jquery-1.12.4.min.js"
-    integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ"
-    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
   <!-- Latest compiled and minified CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
-    integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
   <!-- Optional theme -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css"
-    integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
   <!-- Latest compiled and minified JavaScript -->
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
-    integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
-    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
 
   <link rel="stylesheet" href="css/start.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spinkit/2.0.1/spinkit.min.css" />
@@ -51,10 +44,14 @@
   </div>
 
   <div id="top" class="container">
+    <a href="https://photos.google.com/" class="pull-right">&nbsp;Google Photos&nbsp;</a>
+    <a href="https://www.google.com/calendar" class="pull-right">&nbsp;Google Calendar&nbsp;</a>
     <h1>GooglePhotos フォトフレーム</h1>
     <hr>
 
     <button class="btn btn-default" v-on:click="do_login">ユーザログイン</button>
+    <input type="checkbox" v-model="access_type_offline" id="login_access_type">
+    <label for="login_access_type">offline</label>
 
     <div v-if="username==null">
       account not ready
@@ -72,6 +69,22 @@
       <hr>
       <button class="btn btn-default" v-on:click="update_image">フォトフレーム画像更新</button><br>
       <img v-bind:src="image_data" class="thumbnail">
+
+      <hr>
+      <div>
+        <button class="btn btn-default btn-sm" v-on:click="calendar_register">register</button>
+        <button class="btn btn-default btn-sm" v-on:click="calendar_unregister">unregister</button>
+      </div>
+      <br>
+      <div class="form-inline">
+        <input type="date" class="form-control" v-model="input_date" v-on:change="date_change"> {{event_list.length}}件<br>
+      </div>
+      <ul>
+        <li v-for="(item, index) in event_list">
+          <span v-if="item.term.type=='date'">終日 : {{item.summary}}</span>
+          <span v-else>{{item.term.time_str}} : {{item.summary}}</span>
+        </li>
+      </ul>
     </div>
 
 

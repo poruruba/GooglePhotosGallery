@@ -4,7 +4,7 @@
 //window.datgui = new dat.GUI();
 
 var new_win;
-const SCOPE = 'https://www.googleapis.com/auth/photoslibrary https://www.googleapis.com/auth/userinfo.profile';
+const SCOPE = 'https://www.googleapis.com/auth/photoslibrary https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/tasks.readonly';
 
 const login_url = 'https://【Node.jsサーバのホスト名】/googleapi-login';
 const googlephotos_base_url = '【Node.jsサーバのホスト名】';
@@ -19,6 +19,9 @@ var vue_options = {
         sharedalbum_check: [],
         username: null,
         image_data: null,
+        access_type_offline: false,
+        input_date: "",
+        event_list: []
     },
     computed: {
     },
@@ -30,7 +33,8 @@ var vue_options = {
         do_login: function () {
             var params = {
                 scope: SCOPE,
-                state: this.state
+                state: this.state,
+                access_type: this.access_type_offline
             };
             new_win = open(login_url + '?' + new URLSearchParams(params).toString(), null, 'width=480,height=750');
         },
@@ -106,6 +110,34 @@ var vue_options = {
                 alert( String(result.num) + '個の画像を取り込みました。' );
             }finally{
                 this.progress_close();
+            }
+        },
+        date_change: async function(){
+            var date = new Date(this.input_date);
+            date.setHours(date.getHours() - 9);
+            var params = {
+                date: date.getTime()
+            };
+            var result = await do_post(googlephotos_base_url + '/googlecalendar-list', params);
+            console.log(result);
+            this.event_list = result.list;
+        },
+        calendar_register: async function(){
+            try{
+                await do_post(googlephotos_base_url + '/googlecalendar-register-webhooks');
+                alert("登録しました。");
+            }catch(error){
+                console.error(error);
+                alert(error);
+            }
+        },
+        calendar_unregister: async function(){
+            try {
+                await do_post(googlephotos_base_url + '/googlecalendar-unregister-webhooks');
+                alert("解除しました。");
+            } catch (error) {
+                console.error(error);
+                alert(error);
             }
         }
     },
