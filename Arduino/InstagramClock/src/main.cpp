@@ -150,12 +150,14 @@ void loop() {
     Serial.println(meigen);
 #endif
 
+#define CALENDAR_ENABLE
     ret = doHttpPost(calendar_url, &json_response);
     if (ret != 0){
       Serial.println("doHttpGetJson Error");
       delay(1000);
       return;
     }
+#endif
 
     last_background_update = now;
     background_updated = true;
