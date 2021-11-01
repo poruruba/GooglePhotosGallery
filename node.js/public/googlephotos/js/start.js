@@ -21,11 +21,19 @@ var vue_options = {
         image_data: null,
         access_type_offline: false,
         input_date: "",
-        event_list: []
+        event_list: [],
+        tasklists: []
     },
     computed: {
     },
     methods: {
+        to_date_string: function(dateTime){
+            if( dateTime ){
+                return new Date(dateTime).toLocaleDateString();
+            }else{
+                return ""
+            }
+        },
         update_image: async function(){
             var blob = await do_get_blob(googlephotos_base_url + '/googlephotos-image');
             this.image_data = URL.createObjectURL(blob);
@@ -139,7 +147,36 @@ var vue_options = {
                 console.error(error);
                 alert(error);
             }
-        }
+        },
+        get_tasklist: async function () {
+            var result = await do_post(googlephotos_base_url + '/googletasks-list');
+            console.log(result);
+            var tasklists = result.list;
+            for( const tasklist of tasklists ){
+                var singletasks = [];
+                var subtasks = [];
+                for( const task of tasklist.list ){
+                    if( task.parent ){
+                        if (!subtasks[task.parent])
+                            subtasks[task.parent] = [];
+                        subtasks[task.parent].push(task);
+                    }else{
+                        singletasks.push(task);
+                    }
+                }
+                for( const key in subtasks ){
+                    var singletask = singletasks.find(item => item.id == key );
+                    if( !singletask ){
+                        console.log("tasklist is invalid");
+                        continue;
+                    }
+                    singletask.list = subtasks[key];
+                }
+
+                tasklist.subtasks = singletasks;
+            }
+            this.tasklists = tasklists;
+        },
     },
     created: function(){
     },
