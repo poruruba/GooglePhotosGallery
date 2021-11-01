@@ -93,12 +93,12 @@
         <li v-for="(item) in tasklists">
           <label>title</label>{{item.title}}
           <ul>
-            <li v-for="(item2) in item.subtasks">
+            <li v-for="(item2) in item.tasks">
               <label>title</label> {{item2.title}}<br>
               <label>notes</label> {{item2.notes}}<br>
               <label>due</label> {{to_date_string(item2.due)}}<br>
               <ul>
-                <li v-for="(item3) in item2.list">
+                <li v-for="(item3) in item2.subtasks">
                   <label>title</label> {{item3.title}}<br>
                   <label>notes</label> {{item3.notes}}<br>
                   <label>due</label> {{to_date_string(item3.due)}}<br>
