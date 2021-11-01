@@ -18,7 +18,6 @@ const TOPIC_CMD = 'calendar/notify';
 
 const mqtt = require('mqtt')
 const { v4: uuidv4 } = require('uuid');
-const jwt_decode = require('jwt-decode');
 const { google } = require('googleapis');
 
 const { URL, URLSearchParams } = require('url');
@@ -78,8 +77,7 @@ exports.handler = async (event, context, callback) => {
         type: "web_hook",
         address: CALENDAR_WEBHOOK_URL
       };
-      const decoded = jwt_decode(token.id_token);
-      var result = await do_post_with_token('https://www.googleapis.com/calendar/v3/calendars/' + decoded.email + '/events/watch', params, token.access_token);
+      var result = await do_post_with_token('https://www.googleapis.com/calendar/v3/calendars/primary/events/watch', params, token.access_token);
       console.log(result);
 
       json.notification = result;
