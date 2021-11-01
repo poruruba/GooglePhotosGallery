@@ -170,10 +170,10 @@ var vue_options = {
                         console.log("tasklist is invalid");
                         continue;
                     }
-                    singletask.list = subtasks[key];
+                    singletask.subtasks = subtasks[key];
                 }
 
-                tasklist.subtasks = singletasks;
+                tasklist.tasks = singletasks;
             }
             this.tasklists = tasklists;
         },
