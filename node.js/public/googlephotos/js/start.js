@@ -4,7 +4,7 @@
 //window.datgui = new dat.GUI();
 
 var new_win;
-const SCOPE = 'https://www.googleapis.com/auth/photoslibrary https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/tasks.readonly';
+const SCOPE = 'https://www.googleapis.com/auth/photoslibrary https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/tasks.readonly';
 
 const login_url = 'https://【Node.jsサーバのホスト名】/googleapi-login';
 const googlephotos_base_url = '【Node.jsサーバのホスト名】';
