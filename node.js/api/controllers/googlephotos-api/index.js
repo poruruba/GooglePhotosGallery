@@ -197,7 +197,6 @@ async function sync_instagram(json){
 
     var ftype = await filetype.fromBuffer(buffer);
     var uploadToken = await do_post_buffer('https://photoslibrary.googleapis.com/v1/uploads', buffer, ftype.mime, json.access_token);
-    consooe.log(updateToken);
 
     params.newMediaItems.push({
       simpleMediaItem: {
