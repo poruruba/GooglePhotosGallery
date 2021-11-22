@@ -185,7 +185,7 @@ async function sync_instagram(json){
 
   var instagram_list = await do_get(api_url + '/instagram-imagelist');
   var params = {
-    albumId: json.albumId,
+    albumId: album_list.id,
     newMediaItems: [],
   };
   for (const instagram of instagram_list.list) {
