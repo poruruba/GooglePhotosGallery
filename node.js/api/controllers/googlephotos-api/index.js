@@ -287,7 +287,7 @@ async function get_all_image_list(album_list, access_token) {
   if (result2.mediaItems)
     media_list = result2.mediaItems;
   while (result2.nextPageToken) {
-    params.pageToken = reulst2.nextPagetoken;
+    params.pageToken = reulst2.nextPageToken;
     result2 = await do_post_with_token('https://photoslibrary.googleapis.com/v1/mediaItems:search', params, access_token);
     media_list = media_list.concat(result2.mediaItems);
   }
@@ -301,7 +301,7 @@ async function get_all_image_list(album_list, access_token) {
     if (result3.mediaItems)
       media_list = media_list.concat(result3.mediaItems);
     while (result3.nextPageToken) {
-      params2.pageToken = reulst3.nextPagetoken;
+      params2.pageToken = reulst3.nextPageToken;
       result4 = await do_post_with_token('https://photoslibrary.googleapis.com/v1/mediaItems:search', params2, access_token);
       media_list = media_list.concat(result4.mediaItems);
     }
